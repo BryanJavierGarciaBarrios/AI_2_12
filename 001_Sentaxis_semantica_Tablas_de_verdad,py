@@ -1,0 +1,65 @@
+import itertools
+
+# Función para evaluar una expresión lógica en forma de cadena
+def evaluate_expression(expression, variable_values):
+    stack = []
+
+    for token in expression:
+        if token.isalpha():
+            stack.append(variable_values[token])
+        elif token == '¬':
+            operand = stack.pop()
+            stack.append(not operand)
+        elif token == '∧':
+            operand2 = stack.pop()
+            operand1 = stack.pop()
+            stack.append(operand1 and operand2)
+        elif token == '∨':
+            operand2 = stack.pop()
+            operand1 = stack.pop()
+            stack.append(operand1 or operand2)
+        elif token == '→':
+            operand2 = stack.pop()
+            operand1 = stack.pop()
+            stack.append(not operand1 or operand2)
+        elif token == '↔':
+            operand2 = stack.pop()
+            operand1 = stack.pop()
+            stack.append((operand1 and operand2) or (not operand1 and not operand2))
+
+    return stack[0]
+
+# Genera todas las combinaciones posibles de valores booleanos para las variables
+def generate_variable_combinations(variables):
+    combinations = []
+    for values in itertools.product([True, False], repeat=len(variables)):
+        combinations.append(dict(zip(variables, values)))
+    return combinations
+
+# Genera y muestra la tabla de verdad para una expresión lógica
+def truth_table(expression, variables):
+    print("Expresión lógica:", expression)
+    print("Variables:", variables)
+    variable_combinations = generate_variable_combinations(variables)
+    print("Tabla de Verdad:")
+    print("|", end="")
+    for variable in variables:
+        print(f" {variable} |", end="")
+    print(" Resultado |")
+    print("|", end="")
+    for _ in variables:
+        print("----|", end="")
+    print("-----------|")
+
+    for values in variable_combinations:
+        result = evaluate_expression(expression, values)
+        print("|", end="")
+        for variable in variables:
+            print(f" {str(values[variable]):^4} |", end="")
+        print(f"  {str(result):^7} |")
+
+# Ejemplo de uso
+expression = "A ∧ B → (C ∨ ¬D)"
+variables = ['A', 'B', 'C', 'D']
+
+truth_table(expression, variables)
